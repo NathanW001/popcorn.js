@@ -29,6 +29,21 @@ var render = Render.create({
     }
 });
 
+// Set onclick listeners for refresh and the other one
+document.getElementsByClassName("back_button")[0].onclick = () => {
+    window.open("https://nathanw001.github.io/");
+}
+var shrink_and_rm = false;
+var disappear_count = 50;
+document.getElementsByClassName("refresh_button")[0].onclick = () => {
+    // balls.forEach((ball) => {
+	// Composite.remove(engine.world, ball)
+    // })
+    shrink_and_rm = true;
+}
+
+
+
 // Turn on and off to see colors
 render.options.wireframes = false
 
@@ -76,15 +91,15 @@ Matter.Events.on(engine, 'collisionStart', (event) => {
     var pairs = event.pairs;    
     for (var i = 0; i < pairs.length; i++) {
         var pair = pairs[i];
-	console.log(pair.bodyA, pair.bodyB)
+	// console.log(pair.bodyA, pair.bodyB)
         if (pair.bodyA === ground) {
             // Matter.Body.applyForce(pair.bodyB, pair.bodyB.position, (0, -10))
-            console.log("A")
+            // console.log("A")
             to_launch.push(pair.bodyB)
         }
         else if (pair.bodyB === ground) {
             // Matter.Body.applyForce(pair.bodyA, pair.bodyA.position, {x:0, y:100})
-            console.log("B", pair)
+            // console.log("B", pair)
             // pair.bodyA.render.fillStyle = '#333'
             to_launch.push(pair.bodyA)
         }
@@ -110,7 +125,7 @@ Matter.Events.on(engine, 'beforeUpdate', (event) => {
     let new_decay = []
     decay_balls.forEach((body) => {
 	if (body.render.fillStyle !== '#ffffff') {
-	    console.log(body.render.fillStyle)
+	    // console.log(body.render.fillStyle)
 	    new_decay.push(body)
 	    let red_avg =  Math.floor((9 * parseInt(body.render.fillStyle.substring(1,3), 16) + parseInt('ff', 16))/10).toString(16)
     	    let green_avg = Math.floor((9 *parseInt(body.render.fillStyle.substring(3,5), 16) + parseInt('ff', 16))/10).toString(16)
@@ -125,23 +140,42 @@ Matter.Events.on(engine, 'beforeUpdate', (event) => {
 	} 
     })
     decay_balls = new_decay
+    if (shrink_and_rm) {
+	balls.forEach((ball) => {
+            Matter.Body.scale(ball, 0.8, 0.8)
+    	})
+	disappear_count -= 1
+	if (disappear_count === 0) {
+	    balls.forEach((ball) => {
+		Composite.remove(engine.world, ball)
+	    })
+	    disappear_count = 50
+	    shrink_and_rm = false
+        }
+    }
 });
 
 var spawn_ball = true;
 
 Matter.Events.on(mouse_constraint, 'startdrag', (event) => {
     spawn_ball = false;
-    console.log("drag");
+    // console.log("drag");
 });
 
 Matter.Events.on(mouse_constraint, 'mouseup', (event) => {
-    console.log(spawn_ball);
+    // console.log(spawn_ball);
     if (spawn_ball === true) {
-    	var new_circle = Bodies.circle(event.mouse.position.x, event.mouse.position.y, Matter.Common.random(20, 40), { friction: 0.00001, restitution: 0.5, density: 0.001 })
-    	new_circle.render.fillStyle = Matter.Common.choose(ball_colors)
+	const rand = Matter.Common.random(0, 1)
+	if (rand <= 0.5) {
+    	    var new_circle = Bodies.circle(event.mouse.position.x, event.mouse.position.y, Matter.Common.random(20, 40), { friction: 0.00001, restitution: 0.5, density: 0.001 })
+    	}
+	else {
+	    var new_circle = Bodies.rectangle(event.mouse.position.x, event.mouse.position.y, Matter.Common.random(40, 80), Matter.Common.random(40, 80), { friction: 0.00001, restitution: 0.5, density: 0.001 })
+	}
+	new_circle.render.fillStyle = Matter.Common.choose(ball_colors)
 	new_circle.frictionAir = 0
 	balls.push(new_circle)
-	if (balls.length > 15) {
+	if (balls.length > 25) {
 	    let ball_to_rm = balls.shift()
 	    Composite.remove(engine.world, ball_to_rm)
 	}
