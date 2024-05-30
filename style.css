@@ -5,4 +5,26 @@ html, body {
 canvas {
     display: block;
 }
+.back_button {
+    filter: invert(98%) sepia(4%) saturate(4985%) hue-rotate(298deg) brightness(125%) contrast(86%);
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 50px;
+    height: 50px;
+}
+.back_button:hover {
+    cursor: pointer;
+}
+.refresh_button {
+    filter: invert(98%) sepia(4%) saturate(4985%) hue-rotate(298deg) brightness(125%) contrast(86%);
+    position: absolute;
+    left: 80px;
+    top: 20px;
+    width: 50px;
+    height: 50px;
+}
+.refresh_button {
+    cursor:pointer;
+}
   
